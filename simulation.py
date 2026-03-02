@@ -4,8 +4,11 @@ from network_setup import create_network
 from congestion_monitor import NodeMonitor
 from adaptive_routing import AdaptiveRouter
 
-# Drain rates per node — tuned so queues stay in a realistic observable range
-DRAIN_RATES = {1: 4, 2: 12, 3: 4, 4: 10, 5: 4, 6: 4}
+# Drain probability per packet arrival event.
+# Each event: +1 packet arrives, then drain 1 with probability DRAIN_PROB.
+# Heavy nodes (2, 4): prob=0.993 → queue fluctuates 0-15, avg ~9 (crosses both thresholds)
+# Light nodes (1,3,5,6): prob=0.85 → arrivals rare enough queue stays low (OK state)
+DRAIN_PROB = {1: 0.85, 2: 0.993, 3: 0.85, 4: 0.993, 5: 0.85, 6: 0.85}
 
 
 def packet_generator(env, node_id, monitor, rate, results):
@@ -15,9 +18,9 @@ def packet_generator(env, node_id, monitor, rate, results):
 
         monitor.queue_length += 1
 
-        # Drain packets (simulate router processing) — per-node drain rate
-        drain = random.randint(DRAIN_RATES[node_id] - 2, DRAIN_RATES[node_id] + 2)
-        monitor.queue_length = max(0, monitor.queue_length - drain)
+        # Probabilistic drain — tuned per node so queues stay in a realistic range
+        if random.random() < DRAIN_PROB[node_id]:
+            monitor.queue_length = max(0, monitor.queue_length - 1)
 
         monitor.traffic_rate = int(rate * 10)
         monitor.delay = monitor.queue_length * 0.005
@@ -50,9 +53,9 @@ def run_simulation(duration=50):
 
     traffic_rates = {
         1: 5,
-        2: 15,
+        2: 15,   # Heavy — will trigger prediction
         3: 5,
-        4: 12,
+        4: 12,   # Heavy — will trigger prediction
         5: 5,
         6: 5
     }
