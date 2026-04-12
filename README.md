@@ -7,8 +7,19 @@ Traditional congestion control reacts after packet loss. This system predicts co
 [Live Demo](https://srijani-das07.github.io/Early-Congestion-Prediction-and-Adaptive-Routing/)
 
 ---
-
 ## Overview
+
+This project predicts network congestion before it occurs and dynamically reroutes traffic to avoid delays and packet loss.
+
+Unlike traditional systems that react after congestion happens, this system:
+- Predicts congestion at 60–70% utilization  
+- Uses a two-stage detection model  
+- Applies adaptive routing to avoid bottlenecks  
+- Visualizes network behavior in real time  
+
+💡 Built using graph algorithms, simulation (SimPy), and real-time visualization.
+
+## Detailed Overview
 
 In a computer network, data packets compete for limited bandwidth. When queues fill up, congestion occurs, leading to delay and packet drops.
 
